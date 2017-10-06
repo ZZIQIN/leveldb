@@ -666,7 +666,7 @@ class Benchmark {
 
 }  // namespace leveldb
 
-int main(int argc, char** argv) {
+int main(int, char**) {
   std::string default_db_path;
   for (int i = 1; i < argc; i++) {
     double d;

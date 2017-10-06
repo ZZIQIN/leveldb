@@ -919,6 +919,8 @@ class Benchmark {
 
   void Compact(ThreadState* thread) {
     db_->CompactRange(NULL, NULL);
+
+    (void)thread;  // Silence unused argument warning.
   }
 
   void PrintStats(const char* key) {

@@ -21,6 +21,8 @@ static void DeleteEntry(const Slice& key, void* value) {
   delete tf->table;
   delete tf->file;
   delete tf;
+
+  (void)key;  // Silence unused argument warning.
 }
 
 static void UnrefEntry(void* arg1, void* arg2) {

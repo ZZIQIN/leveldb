@@ -55,7 +55,7 @@ TEST(Coding, Fixed64) {
 TEST(Coding, EncodingOutput) {
   std::string dst;
   PutFixed32(&dst, 0x04030201);
-  ASSERT_EQ(4, dst.size());
+  ASSERT_EQ(4U, dst.size());
   ASSERT_EQ(0x01, static_cast<int>(dst[0]));
   ASSERT_EQ(0x02, static_cast<int>(dst[1]));
   ASSERT_EQ(0x03, static_cast<int>(dst[2]));
@@ -63,7 +63,7 @@ TEST(Coding, EncodingOutput) {
 
   dst.clear();
   PutFixed64(&dst, 0x0807060504030201ull);
-  ASSERT_EQ(8, dst.size());
+  ASSERT_EQ(8U, dst.size());
   ASSERT_EQ(0x01, static_cast<int>(dst[0]));
   ASSERT_EQ(0x02, static_cast<int>(dst[1]));
   ASSERT_EQ(0x03, static_cast<int>(dst[2]));
@@ -191,6 +191,6 @@ TEST(Coding, Strings) {
 
 }  // namespace leveldb
 
-int main(int argc, char** argv) {
+int main(int, char**) {
   return leveldb::test::RunAllTests();
 }

@@ -373,6 +373,6 @@ TEST(SkipTest, Concurrent5) { RunConcurrent(5); }
 
 }  // namespace leveldb
 
-int main(int argc, char** argv) {
+int main(int, char**) {
   return leveldb::test::RunAllTests();
 }

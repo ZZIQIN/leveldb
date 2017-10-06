@@ -10,6 +10,7 @@ Env::~Env() {
 }
 
 Status Env::NewAppendableFile(const std::string& fname, WritableFile** result) {
+  (void)result;  // Silence unused argument warning.
   return Status::NotSupported("NewAppendableFile", fname);
 }
 

@@ -10,7 +10,6 @@
 
 namespace leveldb {
 
-static const int kDelayMicros = 100000;
 static const int kReadOnlyFileLimit = 4;
 static const int kMMapLimit = 4;
 
@@ -58,7 +57,7 @@ TEST(EnvPosixTest, TestOpenOnRead) {
 
 }  // namespace leveldb
 
-int main(int argc, char** argv) {
+int main(int, char**) {
   // All tests currently run with the same read-only file limits.
   leveldb::EnvPosixTest::SetFileLimits(leveldb::kReadOnlyFileLimit,
                                        leveldb::kMMapLimit);

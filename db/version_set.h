@@ -39,9 +39,9 @@ class WritableFile;
 // Return the smallest index i such that files[i]->largest >= key.
 // Return files.size() if there is no such file.
 // REQUIRES: "files" contains a sorted list of non-overlapping files.
-extern int FindFile(const InternalKeyComparator& icmp,
-                    const std::vector<FileMetaData*>& files,
-                    const Slice& key);
+extern size_t FindFile(const InternalKeyComparator& icmp,
+                       const std::vector<FileMetaData*>& files,
+                       const Slice& key);
 
 // Returns true iff some file in "files" overlaps the user key range
 // [*smallest,*largest].
@@ -379,10 +379,10 @@ class Compaction {
   // State used to check for number of of overlapping grandparent files
   // (parent == level_ + 1, grandparent == level_ + 2)
   std::vector<FileMetaData*> grandparents_;
-  size_t grandparent_index_;  // Index in grandparent_starts_
-  bool seen_key_;             // Some output key has been seen
-  int64_t overlapped_bytes_;  // Bytes of overlap between current output
-                              // and grandparent files
+  size_t grandparent_index_;   // Index in grandparent_starts_
+  bool seen_key_;              // Some output key has been seen
+  uint64_t overlapped_bytes_;  // Bytes of overlap between current output
+                               // and grandparent files
 
   // State for implementing IsBaseLevelForKey
 

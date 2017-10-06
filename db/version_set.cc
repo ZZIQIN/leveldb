@@ -20,26 +20,28 @@
 
 namespace leveldb {
 
-static int TargetFileSize(const Options* options) {
+static size_t TargetFileSize(const Options* options) {
   return options->max_file_size;
 }
 
 // Maximum bytes of overlaps in grandparent (i.e., level+2) before we
 // stop building a single file in a level->level+1 compaction.
-static int64_t MaxGrandParentOverlapBytes(const Options* options) {
+static uint64_t MaxGrandParentOverlapBytes(const Options* options) {
   return 10 * TargetFileSize(options);
 }
 
 // Maximum number of bytes in all compacted files.  We avoid expanding
 // the lower level file set of a compaction if it would make the
 // total compaction cover more than this many bytes.
-static int64_t ExpandedCompactionByteSizeLimit(const Options* options) {
+static uint64_t ExpandedCompactionByteSizeLimit(const Options* options) {
   return 25 * TargetFileSize(options);
 }
 
 static double MaxBytesForLevel(const Options* options, int level) {
   // Note: the result for level zero is not really used since we set
   // the level-0 compaction threshold based on number of files.
+
+  (void)options;  // Silence unused argument warning.
 
   // Result for both level-0 and level-1
   double result = 10. * 1048576.0;
@@ -51,12 +53,14 @@ static double MaxBytesForLevel(const Options* options, int level) {
 }
 
 static uint64_t MaxFileSizeForLevel(const Options* options, int level) {
+  (void)level;  // Silence unused argument warning.
+
   // We could vary per level to reduce number of files?
   return TargetFileSize(options);
 }
 
-static int64_t TotalFileSize(const std::vector<FileMetaData*>& files) {
-  int64_t sum = 0;
+static uint64_t TotalFileSize(const std::vector<FileMetaData*>& files) {
+  uint64_t sum = 0;
   for (size_t i = 0; i < files.size(); i++) {
     sum += files[i]->file_size;
   }
@@ -83,13 +87,13 @@ Version::~Version() {
   }
 }
 
-int FindFile(const InternalKeyComparator& icmp,
-             const std::vector<FileMetaData*>& files,
-             const Slice& key) {
-  uint32_t left = 0;
-  uint32_t right = files.size();
+size_t FindFile(const InternalKeyComparator& icmp,
+                const std::vector<FileMetaData*>& files,
+                const Slice& key) {
+  size_t left = 0;
+  size_t right = files.size();
   while (left < right) {
-    uint32_t mid = (left + right) / 2;
+    size_t mid = (left + right) / 2;
     const FileMetaData* f = files[mid];
     if (icmp.InternalKeyComparator::Compare(f->largest.Encode(), key) < 0) {
       // Key at "mid.largest" is < "target".  Therefore all
@@ -140,7 +144,7 @@ bool SomeFileOverlapsRange(
   }
 
   // Binary search over file list
-  uint32_t index = 0;
+  size_t index = 0;
   if (smallest_user_key != NULL) {
     // Find the earliest possible internal key for smallest_user_key
     InternalKey small(*smallest_user_key, kMaxSequenceNumber,kValueTypeForSeek);
@@ -204,7 +208,7 @@ class Version::LevelFileNumIterator : public Iterator {
  private:
   const InternalKeyComparator icmp_;
   const std::vector<FileMetaData*>* const flist_;
-  uint32_t index_;
+  size_t index_;
 
   // Backing store for value().  Holds the file number and size.
   mutable char value_buf_[16];
@@ -315,7 +319,7 @@ void Version::ForEachOverlapping(Slice user_key, Slice internal_key,
     if (num_files == 0) continue;
 
     // Binary search to find earliest index whose largest key >= internal_key.
-    uint32_t index = FindFile(vset_->icmp_, files_[level], internal_key);
+    size_t index = FindFile(vset_->icmp_, files_[level], internal_key);
     if (index < num_files) {
       FileMetaData* f = files_[level][index];
       if (ucmp->Compare(user_key, f->smallest.user_key()) < 0) {
@@ -358,7 +362,7 @@ Status Version::Get(const ReadOptions& options,
       // Level-0 files may overlap each other.  Find all files that
       // overlap user_key and process them in order from newest to oldest.
       tmp.reserve(num_files);
-      for (uint32_t i = 0; i < num_files; i++) {
+      for (size_t i = 0; i < num_files; i++) {
         FileMetaData* f = files[i];
         if (ucmp->Compare(user_key, f->smallest.user_key()) >= 0 &&
             ucmp->Compare(user_key, f->largest.user_key()) <= 0) {
@@ -372,7 +376,7 @@ Status Version::Get(const ReadOptions& options,
       num_files = tmp.size();
     } else {
       // Binary search to find earliest index whose largest key >= ikey.
-      uint32_t index = FindFile(vset_->icmp_, files_[level], ikey);
+      size_t index = FindFile(vset_->icmp_, files_[level], ikey);
       if (index >= num_files) {
         files = NULL;
         num_files = 0;
@@ -389,7 +393,7 @@ Status Version::Get(const ReadOptions& options,
       }
     }
 
-    for (uint32_t i = 0; i < num_files; ++i) {
+    for (size_t i = 0; i < num_files; ++i) {
       if (last_file_read != NULL && stats->seek_file == NULL) {
         // We have had more than one seek for this read.  Charge the 1st file.
         stats->seek_file = last_file_read;
@@ -516,7 +520,7 @@ int Version::PickLevelForMemTableOutput(
       if (level + 2 < config::kNumLevels) {
         // Check that file does not overlap too many grandparent bytes.
         GetOverlappingInputs(level + 2, &start, &limit, &overlaps);
-        const int64_t sum = TotalFileSize(overlaps);
+        const uint64_t sum = TotalFileSize(overlaps);
         if (sum > MaxGrandParentOverlapBytes(vset_->options_)) {
           break;
         }
@@ -907,6 +911,7 @@ Status VersionSet::Recover(bool *save_manifest) {
     Status* status;
     virtual void Corruption(size_t bytes, const Status& s) {
       if (this->status->ok()) *this->status = s;
+      (void)bytes;  // Silence unused argument warning.
     }
   };
 
@@ -1362,9 +1367,9 @@ void VersionSet::SetupOtherInputs(Compaction* c) {
   if (!c->inputs_[1].empty()) {
     std::vector<FileMetaData*> expanded0;
     current_->GetOverlappingInputs(level, &all_start, &all_limit, &expanded0);
-    const int64_t inputs0_size = TotalFileSize(c->inputs_[0]);
-    const int64_t inputs1_size = TotalFileSize(c->inputs_[1]);
-    const int64_t expanded0_size = TotalFileSize(expanded0);
+    const uint64_t inputs0_size = TotalFileSize(c->inputs_[0]);
+    const uint64_t inputs1_size = TotalFileSize(c->inputs_[1]);
+    const uint64_t expanded0_size = TotalFileSize(expanded0);
     if (expanded0.size() > c->inputs_[0].size() &&
         inputs1_size + expanded0_size <
             ExpandedCompactionByteSizeLimit(options_)) {

@@ -45,6 +45,7 @@ static std::string GetDirName(const std::string filename) {
 
 Status SyncDir(const std::string& dir) {
   // As this is a test it isn't required to *actually* sync this directory.
+  (void)dir;  // Silence unused argument warning.
   return Status::OK();
 }
 
@@ -549,6 +550,6 @@ TEST(FaultInjectionTest, FaultTestWithLogReuse) {
 
 }  // namespace leveldb
 
-int main(int argc, char** argv) {
+int main(int, char**) {
   return leveldb::test::RunAllTests();
 }

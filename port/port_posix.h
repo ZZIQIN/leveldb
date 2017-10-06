@@ -136,6 +136,7 @@ inline bool Snappy_Uncompress(const char* input, size_t length,
 }
 
 inline bool GetHeapProfile(void (*func)(void*, const char*, int), void* arg) {
+  (void)func; (void)arg;  // Silence unused argument warning.
   return false;
 }
 

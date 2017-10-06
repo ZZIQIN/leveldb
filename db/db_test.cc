@@ -1891,6 +1891,7 @@ class ModelDB: public DB {
   virtual Status Get(const ReadOptions& options,
                      const Slice& key, std::string* value) {
     assert(false);      // Not implemented
+    (void)options; (void)key; (void)value;  // Silence unused argument warnings.
     return Status::NotFound(key);
   }
   virtual Iterator* NewIterator(const ReadOptions& options) {
@@ -1914,11 +1915,13 @@ class ModelDB: public DB {
     delete reinterpret_cast<const ModelSnapshot*>(snapshot);
   }
   virtual Status Write(const WriteOptions& options, WriteBatch* batch) {
+    (void)options;  // Silence unused argument warning.
     class Handler : public WriteBatch::Handler {
      public:
       KVMap* map_;
       virtual void Put(const Slice& key, const Slice& value) {
         (*map_)[key.ToString()] = value.ToString();
+        (void)value;  // Silence unused argument warning.
       }
       virtual void Delete(const Slice& key) {
         map_->erase(key.ToString());
@@ -1930,14 +1933,17 @@ class ModelDB: public DB {
   }
 
   virtual bool GetProperty(const Slice& property, std::string* value) {
+    (void)property; (void)value;  // Silence unused argument warnings.
     return false;
   }
   virtual void GetApproximateSizes(const Range* r, int n, uint64_t* sizes) {
     for (int i = 0; i < n; i++) {
       sizes[i] = 0;
     }
+    (void)r;  // Silence unused argument warning.
   }
   virtual void CompactRange(const Slice* start, const Slice* end) {
+    (void)start; (void)end;  // Silence unused argument warnings.
   }
 
  private:

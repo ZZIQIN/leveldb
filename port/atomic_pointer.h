@@ -53,13 +53,6 @@ namespace port {
 // http://msdn.microsoft.com/en-us/library/ms684208(v=vs.85).aspx
 #define LEVELDB_HAVE_MEMORY_BARRIER
 
-// Mac OS
-#elif defined(__APPLE__)
-inline void MemoryBarrier() {
-  OSMemoryBarrier();
-}
-#define LEVELDB_HAVE_MEMORY_BARRIER
-
 // Gcc on x86
 #elif defined(ARCH_CPU_X86_FAMILY) && defined(__GNUC__)
 inline void MemoryBarrier() {

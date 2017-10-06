@@ -141,11 +141,13 @@ Table::~Table() {
 
 static void DeleteBlock(void* arg, void* ignored) {
   delete reinterpret_cast<Block*>(arg);
+  (void)ignored;  // Silence unused argument warning.
 }
 
 static void DeleteCachedBlock(const Slice& key, void* value) {
   Block* block = reinterpret_cast<Block*>(value);
   delete block;
+  (void)key;  // Silence unused argument warning.
 }
 
 static void ReleaseBlock(void* arg, void* h) {

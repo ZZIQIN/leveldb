@@ -336,6 +336,6 @@ TEST(RecoveryTest, ManifestMissing) {
 
 }  // namespace leveldb
 
-int main(int argc, char** argv) {
+int main(int, char**) {
   return leveldb::test::RunAllTests();
 }

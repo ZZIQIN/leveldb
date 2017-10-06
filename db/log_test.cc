@@ -586,6 +586,6 @@ TEST(LogTest, ReadPastEnd) {
 }  // namespace log
 }  // namespace leveldb
 
-int main(int argc, char** argv) {
+int main(int, char**) {
   return leveldb::test::RunAllTests();
 }

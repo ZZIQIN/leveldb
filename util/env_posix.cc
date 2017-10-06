@@ -211,6 +211,7 @@ class PosixMmapReadableFile: public RandomAccessFile {
     } else {
       *result = Slice(reinterpret_cast<char*>(mmapped_region_) + offset, n);
     }
+    (void)scratch;  // Silence unused argument warning.
     return s;
   }
 };

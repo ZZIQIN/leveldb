@@ -1061,6 +1061,8 @@ static void CleanupIteratorState(void* arg1, void* arg2) {
   state->version->Unref();
   state->mu->Unlock();
   delete state;
+
+  (void)arg2;  // Silence unused argument warning.
 }
 }  // namespace
 

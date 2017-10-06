@@ -13,8 +13,6 @@
 namespace leveldb {
 
 static const int kDelayMicros = 100000;
-static const int kReadOnlyFileLimit = 4;
-static const int kMMapLimit = 4;
 
 class EnvTest {
  private:
@@ -64,12 +62,13 @@ TEST(EnvTest, ReadWrite) {
   std::string read_result;
   std::string scratch;
   while (read_result.size() < data.size()) {
-    int len = std::min<int>(rnd.Skewed(18), data.size() - read_result.size());
-    scratch.resize(std::max(len, 1));  // at least 1 so &scratch[0] is legal
+    size_t len =
+        std::min<size_t>(rnd.Skewed(18), data.size() - read_result.size());
+    scratch.resize(std::max<size_t>(len, 1));  // at least 1 so &scratch[0] is legal
     Slice read;
     ASSERT_OK(sequential_file->Read(len, &read, &scratch[0]));
     if (len > 0) {
-      ASSERT_GT(read.size(), 0);
+      ASSERT_GT(read.size(), 0U);
     }
     ASSERT_LE(read.size(), len);
     read_result.append(read.data(), read.size());
@@ -114,7 +113,7 @@ TEST(EnvTest, RunMany) {
 
   env_->SleepForMicroseconds(kDelayMicros);
   void* cur = last_id.Acquire_Load();
-  ASSERT_EQ(4, reinterpret_cast<uintptr_t>(cur));
+  ASSERT_EQ(4U, reinterpret_cast<uintptr_t>(cur));
 }
 
 struct State {
@@ -218,6 +217,6 @@ TEST(EnvTest, ReopenAppendableFile) {
 
 }  // namespace leveldb
 
-int main(int argc, char** argv) {
+int main(int, char**) {
   return leveldb::test::RunAllTests();
 }
